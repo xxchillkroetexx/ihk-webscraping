@@ -29,7 +29,7 @@ for berufid in berufids:
 
     # Webantwort in Datei für später speichern
     savefile = open("H:/temp/python/{0}.txt".format(berufid), "w")
-    savefile.write(response + "\n")
+    savefile.write(response)
     savefile.close()
 
     # 5 Sekunden warten, bis nächste Abfrage ausgeführt wird
