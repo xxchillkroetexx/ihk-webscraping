@@ -5,15 +5,25 @@ from bs4 import BeautifulSoup
 
 # Variablen
 # Link, der abgefragt werden soll
-link = "https://pes.ihk.de//Auswertung.cfm?Beruf={}"
+link = "https://pes.ihk.de/Auswertung.cfm?Beruf={}"
 
-
-# Code
 # Berufenummern aus Datei in Liste speichern
-idfile = open(
-    "H:/Nextcloud/Dokumente/Programming/Python/webscraping/berufe_nummern.txt", "r")
-berufids = idfile.readlines()
-idfile.close()
+file = open(
+    "berufe_nummern.txt", "r")
+berufids = file.readlines()
+file.close()
+# Standorte in Liste speichern
+file = open(
+    "standorte.txt", "r")
+standorte = file.readlines()
+file.close()
+
+file = open(
+    "bundesland.txt", "r")
+laender = file.readlines()
+file.close()
+
+bundesweit = 999
 
 
 def removeLastN(string, n):  # Letzen N Zeichen aus string entfernen
@@ -27,16 +37,19 @@ for berufid in berufids:
     berufid = removeLastN(berufid, 1)
 
     # Abfragelink  für jede ID erstellen
-    abfrage = link.format(berufid)
-    print(abfrage)
-    # Abfrage pro Bundesland oder IHK Standort
-    # for zeile in ihkliste:
-    #    abfrage = abfrage + "&pm=" + \
-    #        str(zeile) + "&pm=" + str(zeile) + \
-    #        "&pm=" + str(zeile)  # neuer Abfragelink
+    abfragelink = link.format(berufid)
+    print(abfragelink)
 
-    # Webabfrage erstellen
-    r = requests.get(abfrage)
+    # Abfrage pro Bundesland oder IHK Standort
+    for land in laender:
+        abfrage = abfrage + "&pm1=" + \
+            str(land) + "&pm2=" + str(land) + \
+            "&pm3=" + str(land)  # neuer Abfragelink
+
+    # Post Request ################################
+    p = requests.post(abfragelink)
+    ###############################################
+    r = requests.get(abfragelink)
     # Antwort aus der Abfrage in Variable speichern
     response = r.text
 
