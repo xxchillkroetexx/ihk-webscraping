@@ -66,10 +66,10 @@ for berufid in berufids:
     # r = requests.get(abfragelink)
 
     print(p.status_code)
-    print(p.text)
+    # print(p.text)
     # Antwort aus der Abfrage in Variable speichern
     response = p.text
-    time.sleep(300)
+    time.sleep(1)
 
     # Webantwort in Datei speichern
     savepath = "H:/temp/python/{0}.html"
