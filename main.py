@@ -1,6 +1,9 @@
 # Module
 import time
 import requests
+from requests.structures import CaseInsensitiveDict
+
+headers = CaseInsensitiveDict()
 
 # Variablen
 # Link, der abgefragt werden soll
@@ -25,7 +28,7 @@ file.close()
 bundesweit = 999
 
 
-def removeLastN(string, n):  # Letzen N Zeichen aus string entfernen
+def removeLastN(string, n):  # Letzten N Zeichen aus string entfernen
     size = len(string)
     string = string[:size - n]
     return string
@@ -39,18 +42,34 @@ for berufid in berufids:
     abfragelink = link.format(berufid)
     print(abfragelink)
 
+    '''
     # Abfrage pro Bundesland oder IHK Standort
     for land in laender:
-        abfrage = abfrage + "&pm1=" + \
-            str(land) + "&pm2=" + str(land) + \
-            "&pm3=" + str(land)  # neuer Abfragelink
+        abfrage = abfragelink + "&pm1=" + \
+                  str(land) + "&pm2=" + str(land) + \
+                  "&pm3=" + str(land)  # neuer Abfragelink
+    '''
 
     # Post Request ################################
-    p = requests.post(abfragelink)
+    # URL für Sessionstart
+    url_0 = "https://pes.ihk.de/Auswertung.cfm"
+    # Post-Daten
+    data = {"termin": "20214", "Beruf": berufid, "action": "Beruf+w%C3%A4hlen"}
+
+    # Session initiieren
+    s = requests.session()
+    s.get(url_0)
+    # Post-request senden
+    p = s.post(abfragelink, data)
+
     ###############################################
-    r = requests.get(abfragelink)
+    # r = requests.get(abfragelink)
+
+    print(p.status_code)
+    print(p.text)
     # Antwort aus der Abfrage in Variable speichern
-    response = r.text
+    response = p.text
+    time.sleep(300)
 
     # Webantwort in Datei speichern
     savepath = "H:/temp/python/{0}.html"
