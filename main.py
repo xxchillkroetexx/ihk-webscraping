@@ -2,6 +2,7 @@
 import time
 import requests
 from requests.structures import CaseInsensitiveDict
+import pandas as pd
 
 headers = CaseInsensitiveDict()
 
@@ -40,7 +41,6 @@ def removeLastN(string, n):
 for berufid in berufids:
     # \n in berufid entfernen
     berufid = removeLastN(berufid, 1)
-
     print(berufid)
 
     # Abfragelink  für jede ID erstellen
@@ -63,12 +63,14 @@ for berufid in berufids:
 
     time.sleep(1)
 
+    """
     # Webantwort in Datei speichern
     savepath = "H:/temp/python/{0}-{1}-{2}.html"
     savepath = savepath.format(berufid, termin, bundesweit)
     savefile = open(savepath, "w")
     savefile.write(postresponse)
     savefile.close()
+    """
 
     print("file saved! - Bund")
     # Abfrage der Länder und IHK-Standorte
@@ -84,6 +86,7 @@ for berufid in berufids:
         getresponse = get.text
         print(get.status_code)
         time.sleep(1)
+        """
         # Webantwort in Datei speichern
         savepath = "H:/temp/python/{0}-{1}-{2}.html"
         savepath = savepath.format(berufid, termin, land)
@@ -92,3 +95,15 @@ for berufid in berufids:
         savefile.close()
 
         print("file saved! - " + savepath)
+        """
+        print("Tabelle wird in Datenbank gespeichert!")
+        tables = pd.read_html(getresponse)
+        # df => Dataframe
+        df = tables[1]
+
+        ###
+        # Datenbank modellieren
+        # Verbindung mit MariaDB herstellen
+        # Felder aus Dataframe in MariaDB schreiben
+        # Skalieren -> Jahre abfragen; Standorte anfragen
+        ###
