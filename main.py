@@ -2,7 +2,6 @@
 import time
 import requests
 from requests.structures import CaseInsensitiveDict
-import pandas as pd
 
 headers = CaseInsensitiveDict()
 
@@ -17,6 +16,10 @@ file.close()
 # Standorte in Liste speichern
 file = open("standorte.txt", "r")
 standorte = file.readlines()
+file.close()
+# Bundesländer in Liste speichern
+file = open("bundesland.txt", "r")
+laender = file.readlines()
 file.close()
 
 bundesweit = 999
@@ -50,19 +53,13 @@ for berufid in berufids:
     # URL für Sessionstart
     url_0 = "https://pes.ihk.de/Auswertung.cfm"
     # Session initiieren
-    session = requests.session()
-    session.get(url_0)
+    s = requests.session()
+    s.get(url_0)
     # Post-request senden
-    # Beruf und Termin wird ausgewählt
-    post = session.post(abfragelink, data)
-    # Alle Länder mit dem "Ländervergleich" abrufen
-    url_vergleich = "https://pes.ihk.de/laedervergleich.cfm"
-    vergleich = session.get(url_vergleich)
-
-    print(post.status_code)
-
+    p = s.post(abfragelink, data)
+    print(p.status_code)
     # Antwort aus der Abfrage in Variable speichern
-    response = vergleich.text
+    postresponse = p.text
 
     time.sleep(1)
 
@@ -70,27 +67,20 @@ for berufid in berufids:
     savepath = "H:/temp/python/{0}-{1}-{2}.html"
     savepath = savepath.format(berufid, termin, bundesweit)
     savefile = open(savepath, "w")
-    savefile.write(response)
+    savefile.write(postresponse)
     savefile.close()
 
     print("file saved! - Bund")
-
-    # Auswertung mit Pandas - IN ARBEIT -
-    tables = pd.read_html(response)
-    print(tables[0])
-    print(tables[1])
-
-    """
-    # Abfrage der IHK-Standorte
-    for standort in standorte:
+    # Abfrage der Länder und IHK-Standorte
+    for land in laender:
         # Zeilenumbruch entfernen
         land = removeLastN(land, 1)
         # neuer Abfragelink
-        requrl = abfragelink + "&pm1=" + str(standort) + "&pm2=" + str(standort) + "&pm3=" + str(standort)
+        requrl = abfragelink + "&pm1=" + str(land) + "&pm2=" + str(land) + "&pm3=" + str(land)
         print(requrl)
 
         # GET-Request an Server stellen
-        get = session.get(requrl)
+        get = s.get(requrl)
         getresponse = get.text
         print(get.status_code)
         time.sleep(1)
@@ -102,4 +92,3 @@ for berufid in berufids:
         savefile.close()
 
         print("file saved! - " + savepath)
-    """
