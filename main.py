@@ -102,7 +102,7 @@ for berufid in berufids:
         df = tables[1]
 
         ###
-        # Datenbank modellieren
+        # Datenbank modellieren - Kommentare/Vorschläge ausstehend
         # Verbindung mit MariaDB herstellen
         # Felder aus Dataframe in MariaDB schreiben
         # Skalieren -> Jahre abfragen; Standorte anfragen
