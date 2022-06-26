@@ -1,4 +1,6 @@
 # Module
+import csv
+import sys
 import time
 import requests
 from requests.structures import CaseInsensitiveDict
@@ -116,80 +118,6 @@ for termin in termine:
             # df => Dataframe
             df = tables[1]
 
-            # Daten aus Frame auswählen
-            # selectedValue = df.iat[Zeile, Spalte]
-            berufID = berufid
-            standortID = land
-            pruefung = termin
-            teilnehmeranzahl = df.iat[2, 2]
-            bestanden = df.iat[3, 2]
-            noteEins = df.iat[6, 2]
-            noteZwei = df.iat[7, 2]
-            noteDrei = df.iat[8, 2]
-            noteVier = df.iat[9, 2]
-            noteFuenf = df.iat[10, 2]
-            noteSechs = df.iat[11, 2]
-
-            # ihkData.csv mit Daten füllen
-            toWrite = [
-                [berufID, standortID, pruefung, teilnehmeranzahl, bestanden, noteEins, noteZwei, noteDrei, noteVier,
-                 noteFuenf, noteSechs]
-            ]
-
-            file = open("ihkData.csv", "a")
-
-            with file:
-                writer = csv.writer(file)
-
-                for row in toWrite:
-                    writer.writerow(row)
-            file.close()
-
-            print("Daten an CSV angehängt!")
-
-# CSV in DB schreiben
-# Verbindung zur Datenbank herstellen
-try:
-    conn = mariadb.connect(
-        host="127.0.0.1",
-        port=3306,
-        user="admin",
-        password="admin")
-except mariadb.Error as e:
-    print(f"Error connecting to the database: {e}")
-    sys.exit(1)
-
-# Cursor wird für die Kommunikation genutzt
-cursor = conn.cursor()
-
-# Verbindung nutzen
-sql_createTable = "CREATE TABLE IF NOT EXISTS ihk." + termin \
-                  + " (" \
-                    "id INT PRIMARY KEY AUTO_INCREMENT, " \
-                    "berufID INT(15), " \
-                    "standortID INT(5), " \
-                    "pruefung INT(5), " \
-                    "teilnehmeranzahl INT(10), " \
-                    "bestanden INT(10), " \
-                    "noteEins INT(10)" \
-                    "noteZwei INT(10)" \
-                    "noteDrei INT(10)" \
-                    "noteVier INT(10)" \
-                    "noteFuenf INT(10)" \
-                    "noteSechs INT(10)" \
-                    ") ENGINE=InnoDB;"
-
-cursor.execute(sql_createTable)
-
-# Verbindung zur Datenbank schließen
-conn.close()
-
-###
-# Datenbank modellieren - Kommentare/Vorschläge ausstehend
-# Verbindung mit MariaDB herstellen
-# Felder aus Dataframe in MariaDB schreiben
-# Skalieren -> Jahre abfragen; Standorte anfragen
-###
             # Daten aus Frame auswählen
             # selectedValue = df.iat[Zeile, Spalte]
             berufID = berufid
