@@ -134,8 +134,7 @@ for termin in termine:
 
             # ihkData.csv mit Daten füllen
             toWrite = [
-                [berufID, standortID, pruefung, teilnehmeranzahl, bestanden, noteEins, noteZwei, noteDrei, noteVier,
-                 noteFuenf, noteSechs]
+                [berufID, standortID, noteEins, noteZwei, noteDrei, noteVier, noteFuenf, noteSechs]
             ]
 
             file = open("ihkData.csv", "a")
@@ -165,29 +164,66 @@ except mariadb.Error as e:
 cursor = conn.cursor()
 
 # Verbindung nutzen
-sql_createTable = "CREATE TABLE IF NOT EXISTS ihk." + termin \
-                  + " (" \
-                    "id INT PRIMARY KEY AUTO_INCREMENT, " \
-                    "berufID INT(15), " \
-                    "standortID INT(5), " \
-                    "pruefung INT(5), " \
-                    "teilnehmeranzahl INT(10), " \
-                    "bestanden INT(10), " \
-                    "noteEins INT(10)" \
-                    "noteZwei INT(10)" \
-                    "noteDrei INT(10)" \
-                    "noteVier INT(10)" \
-                    "noteFuenf INT(10)" \
-                    "noteSechs INT(10)" \
-                    ") ENGINE=InnoDB;"
+# SQL-Statements
+# Tabellen erstellen
+sql_createTableBerufe = "DROP TABLE ihk.berufe;" \
+                        "GO;" \
+                        "" \
+                        "CREATE TABLE IF NOT EXISTS ihk.berufe(" \
+                        "   berufeID INT(15) PRIMARY KEY," \
+                        "   berufBezeichnung VARCHAR(255)" \
+                        ") ENGINE=InnoDB;" \
+                        "GO;"
 
-cursor.execute(sql_createTable)
+sql_createTableStandorte = "DROP TABLE ihk.standorte;" \
+                           "GO;" \
+                           "" \
+                           "CREATE TABLE IF NOT EXISTS ihk.standorte(" \
+                           "	standortID INT(5) PRIMARY KEY," \
+                           "	standortName VARCHAR(255)" \
+                           ") ENGINE=InnoDB;" \
+                           "GO;"
+
+sql_createTableErgebnisse = "DROP TABLE ihk.ergebnisse;" \
+                            "GO;" \
+                            "" \
+                            "CREATE TABLE IF NOT EXISTS ihk.ergebnisse(" \
+                            "	ergebnissid INT PRIMARY KEY AUTO_INCREMENT," \
+                            "	berufID INT(15) FOREIGN_KEY," \
+                            "	standortID INT(5) FOREIGN_KEY," \
+                            "	pruefung INT(5) FOREIGN_KEY," \
+                            "teilnehmeranzahl INT(10) AS COUNT(noteEins,noteZwei,noteDrei,noteVier,noteFuenf," \
+                            "noteSechs)," \
+                            "	bestanden INT(10) AS COUNT(noteEins,noteZwei,noteDrei,noteVier)," \
+                            "	noteEins INT(10)," \
+                            "	noteZwei INT(10)," \
+                            "	noteDrei INT(10)," \
+                            "	noteVier INT(10)," \
+                            "	noteFuenf INT(10)," \
+                            "   noteSechs INT(10)," \
+                            "	CONSTRAINT UC_Ergebnis UNIQUE (berufID,standortID,pruefung)" \
+                            ") ENGINE=InnoDB;" \
+                            "GO;"
+
+# SVG-File in Datenbank importieren
+sql_insertIntoTable = "BULK INSERT ihk.ergebnisse (berufID,standortID,noteEins,noteZwei,noteVier,noteFuenf,noteSechs)" \
+                      "FROM '.\ihkData.csv'" \
+                      "WITH (" \
+                      " FORMAT='CSV'," \
+                      " FIRSTROW=2" \
+                      ");" \
+                      "GO;"
+
+# SQL-Statements auf Datenbank ausführen
+cursor.execute(sql_createTableBerufe)
+cursor.execute(sql_createTableStandorte)
+cursor.execute(sql_createTableErgebnisse)
+cursor.execute(sql_insertIntoTable)
 
 # Verbindung zur Datenbank schließen
 conn.close()
 
 ###
-# Datenbank modellieren - Kommentare/Vorschläge ausstehend
-# CSV in Datenbank schreiben
 # Skalieren -> Jahre abfragen; Standorte anfragen
+# Abfragen auf mehrere Server/Nodes auslagern um Workload und andere
 ###
