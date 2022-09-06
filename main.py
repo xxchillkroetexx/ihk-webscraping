@@ -192,7 +192,7 @@ sql_createTableErgebnisse = "DROP TABLE ihk.ergebnisse;" \
                             "	berufID INT(15) FOREIGN_KEY," \
                             "	standortID INT(5) FOREIGN_KEY," \
                             "	pruefung INT(5) FOREIGN_KEY," \
-                            "teilnehmeranzahl INT(10) AS COUNT(noteEins,noteZwei,noteDrei,noteVier,noteFuenf," \
+                            "   teilnehmeranzahl INT(10) AS COUNT(noteEins,noteZwei,noteDrei,noteVier,noteFuenf," \
                             "noteSechs)," \
                             "	bestanden INT(10) AS COUNT(noteEins,noteZwei,noteDrei,noteVier)," \
                             "	noteEins INT(10)," \
